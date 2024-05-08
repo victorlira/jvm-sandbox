@@ -1,5 +1,6 @@
 package com.alibaba.jvm.sandbox.qatest.core.enhance.transformer;
 
+import com.alibaba.jvm.sandbox.core.Constants;
 import com.alibaba.jvm.sandbox.core.enhance.weaver.asm.AsmMethods;
 import com.alibaba.jvm.sandbox.core.enhance.weaver.asm.AsmTypes;
 import com.alibaba.jvm.sandbox.core.util.AsmUtils;
@@ -15,7 +16,6 @@ import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
 import static org.objectweb.asm.ClassReader.EXPAND_FRAMES;
 import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
 import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
-import static org.objectweb.asm.Opcodes.ASM7;
 
 /**
  * 测试第三方增强冲突情况
@@ -35,7 +35,7 @@ public class TestThirdEnhance{
         // 返回增强后字节码
         final ClassReader cr = new ClassReader(classfileBuffer);
         final ClassWriter cw = createClassWriter(loader, cr);
-        cr.accept(new ThirdClassVisitor(ASM7,cw,signCodes,cr.getClassName()),
+        cr.accept(new ThirdClassVisitor(Constants.SUPPORT_ASM,cw,signCodes,cr.getClassName()),
             EXPAND_FRAMES
         );
         return dumpClassIfNecessary(cr.getClassName(), cw.toByteArray());

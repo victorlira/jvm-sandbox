@@ -310,9 +310,6 @@ public class AgentLauncher {
 
         // KV对片段数组
         final String[] kvPairSegmentArray = featureString.split(";");
-        if (kvPairSegmentArray.length == 0) {
-            return featureMap;
-        }
 
         for (String kvPairSegmentString : kvPairSegmentArray) {
             if (isBlankString(kvPairSegmentString)) {

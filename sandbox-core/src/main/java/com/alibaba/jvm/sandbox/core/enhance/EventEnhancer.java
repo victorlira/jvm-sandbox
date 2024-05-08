@@ -1,6 +1,7 @@
 package com.alibaba.jvm.sandbox.core.enhance;
 
 import com.alibaba.jvm.sandbox.api.event.Event;
+import com.alibaba.jvm.sandbox.core.Constants;
 import com.alibaba.jvm.sandbox.core.enhance.weaver.asm.EventWeaver;
 import com.alibaba.jvm.sandbox.core.util.AsmUtils;
 import com.alibaba.jvm.sandbox.core.util.ObjectIDs;
@@ -17,7 +18,6 @@ import static org.apache.commons.io.FileUtils.writeByteArrayToFile;
 import static org.objectweb.asm.ClassReader.EXPAND_FRAMES;
 import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
 import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
-import static org.objectweb.asm.Opcodes.ASM7;
 
 /**
  * 事件代码增强器
@@ -104,7 +104,7 @@ public class EventEnhancer implements Enhancer {
         final ClassWriter cw = createClassWriter(targetClassLoader, cr);
         final int targetClassLoaderObjectID = ObjectIDs.instance.identity(targetClassLoader);
         cr.accept(
-                new EventWeaver(ASM7, cw, namespace, listenerId,
+                new EventWeaver(Constants.SUPPORT_ASM, cw, namespace, listenerId,
                         targetClassLoaderObjectID,
                         cr.getClassName(),
                         signCodes,

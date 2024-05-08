@@ -207,8 +207,7 @@ public class ModuleMgrModule implements Module {
         final int cCnt = moduleManager.cCnt(info.id());
         final int mCnt = moduleManager.mCnt(info.id());
         final File jarFile = moduleManager.getJarFile(info.id());
-        String sb = "" +
-                "      ID : " + info.id() + "\n" +
+        String sb = "      ID : " + info.id() + "\n" +
                 " VERSION : " + info.version() + "\n" +
                 "  AUTHOR : " + info.author() + "\n" +
                 "JAR_FILE : " + jarFile.getPath() + "\n" +

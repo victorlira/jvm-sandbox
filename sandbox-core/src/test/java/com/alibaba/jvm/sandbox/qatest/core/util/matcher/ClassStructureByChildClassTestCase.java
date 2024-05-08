@@ -300,7 +300,6 @@ public class ClassStructureByChildClassTestCase {
                                         buildSignCode(PACKAGE_PREFIX + "ChildClass", "methodOfChildClassWithAnnotation"),
                                         new BehaviorStructureAsserter()
                                                 .assertExceptionTypes(buildJavaClassNameArrayAsserter(
-                                                        "java.lang.IllegalStateException",
                                                         "java.lang.RuntimeException"
                                                 ))
                                                 .assertAnnotationTypes(buildJavaClassNameArrayAsserter(

@@ -1,6 +1,7 @@
 package com.alibaba.jvm.sandbox.core.util.matcher.structure;
 
 import com.alibaba.jvm.sandbox.api.util.LazyGet;
+import com.alibaba.jvm.sandbox.core.Constants;
 import com.alibaba.jvm.sandbox.core.util.BitUtils;
 import com.alibaba.jvm.sandbox.core.util.collection.Pair;
 import com.alibaba.jvm.sandbox.core.util.matcher.structure.PrimitiveClassStructure.Primitive;
@@ -256,14 +257,14 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
     private Access fixAccess() {
         final AtomicInteger accessRef = new AtomicInteger(this.classReader.getAccess());
         final String internalClassName = this.classReader.getClassName();
-        this.classReader.accept(new ClassVisitor(ASM7) {
+        this.classReader.accept(new ClassVisitor(Constants.SUPPORT_ASM) {
             @Override
             public void visitInnerClass(String name, String outerName, String innerName, int access) {
                 if (StringUtils.equals(name, internalClassName)) {
                     accessRef.set(access);
                 }
             }
-        }, ASM7);
+        }, Constants.SUPPORT_ASM);
         return new AccessImplByAsm(accessRef.get());
     }
 
@@ -413,7 +414,7 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
         @Override
         protected List<ClassStructure> initialValue() {
             final List<ClassStructure> annotationTypeClassStructures = new ArrayList<>();
-            accept(new ClassVisitor(ASM7) {
+            accept(new ClassVisitor(Constants.SUPPORT_ASM) {
 
                 @Override
                 public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
@@ -442,7 +443,7 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
         @Override
         protected List<BehaviorStructure> initialValue() {
             final List<BehaviorStructure> behaviorStructures = new ArrayList<>();
-            accept(new ClassVisitor(ASM7) {
+            accept(new ClassVisitor(Constants.SUPPORT_ASM) {
 
                 @Override
                 public MethodVisitor visitMethod(final int access,
@@ -457,7 +458,7 @@ public class ClassStructureImplByAsm extends FamilyClassStructure {
                         return super.visitMethod(access, name, desc, signature, exceptions);
                     }
 
-                    return new MethodVisitor(ASM7, super.visitMethod(access, name, desc, signature, exceptions)) {
+                    return new MethodVisitor(Constants.SUPPORT_ASM, super.visitMethod(access, name, desc, signature, exceptions)) {
 
                         private final Type methodType = Type.getMethodType(desc);
                         private final List<ClassStructure> annotationTypeClassStructures = new ArrayList<>();
