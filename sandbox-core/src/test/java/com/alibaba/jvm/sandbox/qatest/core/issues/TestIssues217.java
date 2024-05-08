@@ -24,7 +24,7 @@ import static com.alibaba.jvm.sandbox.qatest.core.util.QaClassUtils.toByteArray;
 
 public class TestIssues217 {
 
-    class GetMatcherModuleEventWatcher extends EmptyModuleEventWatcher {
+    static class GetMatcherModuleEventWatcher extends EmptyModuleEventWatcher {
 
         private EventWatchCondition condition;
 

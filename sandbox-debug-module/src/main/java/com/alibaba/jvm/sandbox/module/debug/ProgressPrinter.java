@@ -32,12 +32,12 @@ public class ProgressPrinter implements ModuleEventWatcher.Progress {
     }
 
     @Override
-    public void progressOnSuccess(Class clazz, int index) {
+    public void progressOnSuccess(Class<?> clazz, int index) {
         progress(index);
     }
 
     @Override
-    public void progressOnFailed(Class clazz, int index, Throwable cause) {
+    public void progressOnFailed(Class<?> clazz, int index, Throwable cause) {
         progress(index);
     }
 

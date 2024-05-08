@@ -83,9 +83,9 @@ public class DefaultModuleEventWatcher implements ModuleEventWatcher {
      * 形变观察所影响的类
      */
     private void reTransformClasses(
-        final int watchId,
-        final List<Class<?>> waitingReTransformClasses,
-        final Progress progress) {
+            final int watchId,
+            final List<Class<?>> waitingReTransformClasses,
+            final Progress progress) {
         // 需要形变总数
         final int total = waitingReTransformClasses.size();
 
@@ -103,7 +103,35 @@ public class DefaultModuleEventWatcher implements ModuleEventWatcher {
         for (final Class<?> waitingReTransformClass : waitingReTransformClasses) {
             index++;
             try {
+
+                // 增强跳过判断，跳过的仍然计数
                 if (null != progress) {
+                    try {
+                        if (progress.isSkip(waitingReTransformClass, index)) {
+                            logger.debug("watch={} in module={} on {} is skipped at index={};total={};",
+                                    watchId, coreModule.getUniqueId(), waitingReTransformClass,
+                                    index - 1, total
+                            );
+                            continue;
+                        }
+                    } catch (Throwable cause) {
+                        logger.warn("watch={} in module={} on {} check skip occur exception at index={};total={};",
+                                watchId, coreModule.getUniqueId(), waitingReTransformClass,
+                                index - 1, total,
+                                cause
+                        );
+                    }
+                }
+
+                // 字节码增强
+                inst.retransformClasses(waitingReTransformClass);
+                logger.info("watch={} in module={} single reTransform {} success, at index={};total={};",
+                        watchId, coreModule.getUniqueId(), waitingReTransformClass,
+                        index - 1, total
+                );
+
+                // 增强成功通知
+                if(null != progress) {
                     try {
                         progress.progressOnSuccess(waitingReTransformClass, index);
                     } catch (Throwable cause) {
@@ -116,11 +144,7 @@ public class DefaultModuleEventWatcher implements ModuleEventWatcher {
                         );
                     }
                 }
-                inst.retransformClasses(waitingReTransformClass);
-                logger.info("watch={} in module={} single reTransform {} success, at index={};total={};",
-                        watchId, coreModule.getUniqueId(), waitingReTransformClass,
-                        index - 1, total
-                );
+
             } catch (Throwable causeOfReTransform) {
                 logger.warn("watch={} in module={} single reTransform {} failed, at index={};total={}. ignore this class.",
                         watchId, coreModule.getUniqueId(), waitingReTransformClass,
@@ -195,7 +219,7 @@ public class DefaultModuleEventWatcher implements ModuleEventWatcher {
         inst.addTransformer(sandClassFileTransformer, true);
 
         //设定Native支持
-        if(isNativeSupported) {
+        if (isNativeSupported) {
             inst.setNativeMethodPrefix(sandClassFileTransformer, sandClassFileTransformer.getNativePrefix());
             logger.debug("watch={} in module={} enable native method supported, prefix={}",
                     watchId,
@@ -218,7 +242,7 @@ public class DefaultModuleEventWatcher implements ModuleEventWatcher {
         try {
 
             // 应用JVM
-            reTransformClasses(watchId,waitingReTransformClasses, progress);
+            reTransformClasses(watchId, waitingReTransformClasses, progress);
             // 计数
             cCnt += sandClassFileTransformer.getAffectStatistic().cCnt();
             mCnt += sandClassFileTransformer.getAffectStatistic().mCnt();

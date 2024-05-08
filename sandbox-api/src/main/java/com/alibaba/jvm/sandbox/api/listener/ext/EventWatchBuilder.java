@@ -856,6 +856,16 @@ public class EventWatchBuilder {
         }
 
         @Override
+        public boolean isSkip(Class<?> clazz, int index) {
+            for (final Progress progress : progresses) {
+                if(progress.isSkip(clazz, index)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
         public void progressOnSuccess(Class<?> clazz, int index) {
             for (final Progress progress : progresses) {
                 progress.progressOnSuccess(clazz, index);

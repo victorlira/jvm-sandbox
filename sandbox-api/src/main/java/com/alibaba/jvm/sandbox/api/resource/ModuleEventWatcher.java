@@ -151,6 +151,20 @@ public interface ModuleEventWatcher {
         void begin(int total);
 
         /**
+         * 是否跳过
+         * <p>
+         * 可以通过这个方法来控制当前类字节码处理是否需要跳过，跳过的类将不会进行字节码增强。
+         *
+         * @param clazz 当前进行行变的类
+         * @param index 当前形变类的序号,从0开始
+         * @return TRUE | FALSE
+         * @since sandbox-api:1.4.1
+         */
+        default boolean isSkip(Class<?> clazz, int index) {
+            return false;
+        }
+
+        /**
          * 进度报告(成功)
          *
          * @param clazz 当前进行行变的类
