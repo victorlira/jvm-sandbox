@@ -72,7 +72,7 @@ public class ModuleJarClassLoader extends RoutingURLClassLoader {
             cleanProtectionDomainWhichCameFromModuleJarClassLoader();
             logger.debug("clean ProtectionDomain in {}'s acc success.", this);
         } catch (Throwable e) {
-            logger.warn("clean ProtectionDomain in {}'s acc failed.", this, e);
+            logger.debug("clean ProtectionDomain in {}'s acc failed.", this, e);
         }
 
     }
