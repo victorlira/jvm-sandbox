@@ -175,7 +175,7 @@ public class AgentLauncher {
      */
     @SuppressWarnings("unused")
     public static synchronized void uninstall(final String namespace) throws Throwable {
-        final SandboxClassLoader sandboxClassLoader = sandboxClassLoaderMap.get(namespace);
+        final SandboxClassLoader sandboxClassLoader = sandboxClassLoaderMap.remove(namespace);
         if (null == sandboxClassLoader) {
             return;
         }
@@ -187,7 +187,6 @@ public class AgentLauncher {
 
         // 关闭SandboxClassLoader
         sandboxClassLoader.closeIfPossible();
-        sandboxClassLoaderMap.remove(namespace);
     }
 
     /**
