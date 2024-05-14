@@ -134,7 +134,7 @@ public class CoreLoadedClassDataSourceTestCase {
     }
 
     private final CoreLoadedClassDataSource coreLoadedClassDataSource
-            = new DefaultCoreLoadedClassDataSource(mockInstrumentation, false, true);
+            = new DefaultCoreLoadedClassDataSource(mockInstrumentation, false, true, true);
 
 
     @Test

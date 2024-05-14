@@ -39,6 +39,7 @@ public class DefaultModuleEventWatcher implements ModuleEventWatcher {
     private final CoreModule coreModule;
     private final boolean isEnableUnsafe;
     private final String namespace;
+    private final boolean isEnableLambda;
 
     // 观察ID序列生成器
     private final Sequencer watchIdSequencer = new Sequencer();
@@ -47,12 +48,14 @@ public class DefaultModuleEventWatcher implements ModuleEventWatcher {
                               final CoreLoadedClassDataSource classDataSource,
                               final CoreModule coreModule,
                               final boolean isEnableUnsafe,
-                              final String namespace) {
+                              final String namespace,
+                              final boolean isEnableLambda) {
         this.inst = inst;
         this.classDataSource = classDataSource;
         this.coreModule = coreModule;
         this.isEnableUnsafe = isEnableUnsafe;
         this.namespace = namespace;
+        this.isEnableLambda = isEnableLambda;
     }
 
 
@@ -209,7 +212,8 @@ public class DefaultModuleEventWatcher implements ModuleEventWatcher {
                         isEnableUnsafe,
                         eventType,
                         namespace,
-                        isNativeSupported
+                        isNativeSupported,
+                        isEnableLambda
                 );
 
         // 注册到CoreModule中

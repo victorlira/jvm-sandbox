@@ -217,7 +217,14 @@ public class DefaultCoreModuleManager implements CoreModuleManager {
                             new ReleaseResource<ModuleEventWatcher>(
                                     SandboxProtector.instance.protectProxy(
                                             ModuleEventWatcher.class,
-                                            new DefaultModuleEventWatcher(inst, classDataSource, coreModule, cfg.isEnableUnsafe(), cfg.getNamespace())
+                                            new DefaultModuleEventWatcher(
+                                                    inst,
+                                                    classDataSource,
+                                                    coreModule,
+                                                    cfg.isEnableUnsafe(),
+                                                    cfg.getNamespace(),
+                                                    cfg.isEnableLambda()
+                                            )
                                     )
                             ) {
                                 @Override

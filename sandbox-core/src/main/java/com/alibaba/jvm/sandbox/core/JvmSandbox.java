@@ -56,7 +56,12 @@ public class JvmSandbox {
         this.coreModuleManager = SandboxProtector.instance.protectProxy(CoreModuleManager.class, new DefaultCoreModuleManager(
                 cfg,
                 inst,
-                new DefaultCoreLoadedClassDataSource(inst, cfg.isEnableUnsafe(), cfg.isNativeSupported()),
+                new DefaultCoreLoadedClassDataSource(
+                        inst,
+                        cfg.isEnableUnsafe(),
+                        cfg.isNativeSupported(),
+                        cfg.isEnableLambda()
+                ),
                 new DefaultProviderManager(cfg)
         ));
         init();

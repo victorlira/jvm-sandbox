@@ -20,26 +20,37 @@ public class UnsupportedMatcher implements Matcher {
     private final ClassLoader loader;
     private final boolean isEnableUnsafe;
     private final boolean isNativeSupported;
+    private final boolean isLambdaSupported;
 
     public UnsupportedMatcher(final ClassLoader loader,
                               final boolean isEnableUnsafe,
-                              final boolean isNativeSupported) {
+                              final boolean isNativeSupported,
+                              final boolean isLambdaSupported) {
         this.loader = loader;
         this.isEnableUnsafe = isEnableUnsafe;
         this.isNativeSupported = isNativeSupported;
+        this.isLambdaSupported = isLambdaSupported;
     }
 
     // 是否因sandbox容器本身缺陷所暂时无法支持的类
     private boolean isUnsupportedClass(final ClassStructure classStructure) {
-        return CoreStringUtils.containsAny(
-                classStructure.getJavaClassName(),
 
-                /*
-                 * Lambda的方法拦截是一个深坑，常规则做法是拦截LambdaMetaFactory，
-                 * 但这种做法相当不干净，而且无法实现ATTACH模式，所以这里选择性的放弃了对Lambda表达式的支持
-                 */
-                "$$Lambda$"
-        );
+        // #377 开放Lambda类的拦截
+        if(CoreStringUtils.containsAny(classStructure.getJavaClassName(), "$$Lambda$")) {
+            return !isLambdaSupported;
+        }
+
+        return false;
+
+//        return CoreStringUtils.containsAny(
+//                classStructure.getJavaClassName(),
+//
+//                /*
+//                 * Lambda的方法拦截是一个深坑，常规则做法是拦截LambdaMetaFactory，
+//                 * 但这种做法相当不干净，而且无法实现ATTACH模式，所以这里选择性的放弃了对Lambda表达式的支持
+//                 */
+//                "$$Lambda$"
+//        );
     }
 
     // 是否已知的常用非必要增强类，常见的如CGLIB、Spring增强的类

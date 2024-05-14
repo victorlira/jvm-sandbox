@@ -37,6 +37,7 @@ public class CoreConfigure {
     private static final String VAL_LAUNCH_MODE_ATTACH = "attach";
 
     private static final String KEY_UNSAFE_ENABLE = "unsafe.enable";
+    private static final String KEY_LAMBDA_ENABLE = "lambda.enable";
     private static final String KEY_NATIVE_SUPPORTED = "native.supported";
 
     // 受保护key数组，在保护key范围之内，以用户传递的配置为准，系统配置不允许覆盖
@@ -295,6 +296,14 @@ public class CoreConfigure {
      */
     public String getJvmSandboxHome() {
         return featureMap.get(KEY_SANDBOX_HOME);
+    }
+
+    /**
+     * 是否启用Lambda类支持
+     * @return lambda.enable
+     */
+    public boolean isEnableLambda() {
+        return BooleanUtils.toBoolean(featureMap.get(KEY_LAMBDA_ENABLE));
     }
 
     /**

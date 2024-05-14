@@ -28,13 +28,16 @@ public class DefaultCoreLoadedClassDataSource implements CoreLoadedClassDataSour
     private final Instrumentation inst;
     private final boolean isEnableUnsafe;
     private final boolean isNativeSupported;
+    private final boolean isLambdaSupported;
 
     public DefaultCoreLoadedClassDataSource(final Instrumentation inst,
                                             final boolean isEnableUnsafe,
-                                            final boolean isNativeSupported) {
+                                            final boolean isNativeSupported,
+                                            final boolean isLambdaSupported) {
         this.inst = inst;
         this.isEnableUnsafe = isEnableUnsafe;
         this.isNativeSupported = isNativeSupported;
+        this.isLambdaSupported = isLambdaSupported;
     }
 
     @Override
@@ -102,7 +105,7 @@ public class DefaultCoreLoadedClassDataSource implements CoreLoadedClassDataSour
                 }
                 try {
                     if (isRemoveUnsupported) {
-                        if (new UnsupportedMatcher(clazz.getClassLoader(), isEnableUnsafe, isNativeSupported)
+                        if (new UnsupportedMatcher(clazz.getClassLoader(), isEnableUnsafe, isNativeSupported, isLambdaSupported)
                                 .and(matcher)
                                 .matching(ClassStructureFactory.createClassStructure(clazz))
                                 .isMatched()) {

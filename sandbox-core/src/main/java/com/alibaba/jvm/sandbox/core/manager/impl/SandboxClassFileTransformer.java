@@ -46,6 +46,7 @@ public class SandboxClassFileTransformer implements ClassFileTransformer {
     private final AffectStatistic affectStatistic = new AffectStatistic();
     private final boolean isNativeSupported;
     private final String nativePrefix;
+    private final boolean isLambdaSupported;
 
     SandboxClassFileTransformer(final int watchId,
                                 final String uniqueId,
@@ -54,7 +55,8 @@ public class SandboxClassFileTransformer implements ClassFileTransformer {
                                 final boolean isEnableUnsafe,
                                 final Type[] eventTypeArray,
                                 final String namespace,
-                                final boolean isNativeSupported) {
+                                final boolean isNativeSupported,
+                                final boolean isLambdaSupported) {
         this.watchId = watchId;
         this.uniqueId = uniqueId;
         this.matcher = matcher;
@@ -65,6 +67,7 @@ public class SandboxClassFileTransformer implements ClassFileTransformer {
         this.listenerId = ObjectIDs.instance.identity(eventListener);
         this.isNativeSupported = isNativeSupported;
         this.nativePrefix = String.format("%s$%s$%s", SANDBOX_SPECIAL_PREFIX, namespace, watchId);
+        this.isLambdaSupported = isLambdaSupported;
     }
 
     // 获取当前类结构
@@ -100,7 +103,7 @@ public class SandboxClassFileTransformer implements ClassFileTransformer {
             }
 
             // 匹配类是否符合要求，如果一个行为都没匹配上也不用继续了
-            final MatchingResult result = new UnsupportedMatcher(loader, isEnableUnsafe, isNativeSupported)
+            final MatchingResult result = new UnsupportedMatcher(loader, isEnableUnsafe, isNativeSupported, isLambdaSupported)
                     .and(matcher)
                     .matching(getClassStructure(loader, classBeingRedefined, srcByteCodeArray));
             if (!result.isMatched()) {
