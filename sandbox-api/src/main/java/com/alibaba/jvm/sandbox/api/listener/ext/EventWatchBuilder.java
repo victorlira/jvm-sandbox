@@ -3,7 +3,6 @@ package com.alibaba.jvm.sandbox.api.listener.ext;
 import com.alibaba.jvm.sandbox.api.event.Event;
 import com.alibaba.jvm.sandbox.api.filter.AccessFlags;
 import com.alibaba.jvm.sandbox.api.filter.ExtFilter;
-import com.alibaba.jvm.sandbox.api.filter.ExtFilterImplByV140;
 import com.alibaba.jvm.sandbox.api.filter.Filter;
 import com.alibaba.jvm.sandbox.api.listener.EventListener;
 import com.alibaba.jvm.sandbox.api.resource.ModuleEventWatcher;
@@ -15,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.alibaba.jvm.sandbox.api.event.Event.Type.*;
 import static com.alibaba.jvm.sandbox.api.listener.ext.EventWatchBuilder.PatternType.WILDCARD;
@@ -763,35 +763,89 @@ public class EventWatchBuilder {
 
     private Filter makeExtFilter(final Filter filter,
                                  final BuildingForClass bfClass) {
-        final ExtFilter extFilter = ExtFilter.ExtFilterFactory.make(
-                filter,
-                bfClass.isIncludeSubClasses,
-                bfClass.isIncludeBootstrap
-        );
-
-        boolean isBehaviorHasWithParameterTypes = false;
-        boolean isBehaviorHasExceptionTypes = false;
-        boolean isBehaviorHasAnnotationTypes = false;
+        final AtomicBoolean isBehaviorHasWithParameterTypes = new AtomicBoolean(false);
+        final AtomicBoolean isBehaviorHasExceptionTypes = new AtomicBoolean(false);
+        final AtomicBoolean isBehaviorHasAnnotationTypes = new AtomicBoolean(false);
         for(final BuildingForBehavior bfBehavior : bfClass.bfBehaviors) {
             if(!bfBehavior.withParameterTypes.isEmpty()) {
-                isBehaviorHasWithParameterTypes = true;
+                isBehaviorHasWithParameterTypes.set(true);
             }
             if(!bfBehavior.hasExceptionTypes.isEmpty()) {
-                isBehaviorHasExceptionTypes = true;
+                isBehaviorHasExceptionTypes.set(true);
             }
             if(!bfBehavior.hasAnnotationTypes.isEmpty()) {
-                isBehaviorHasAnnotationTypes = true;
+                isBehaviorHasAnnotationTypes.set(true);
             }
         }
 
-        return new ExtFilterImplByV140(
-                extFilter,
-                !bfClass.hasInterfaceTypes.isEmpty(),
-                !bfClass.hasAnnotationTypes.isEmpty(),
-                isBehaviorHasWithParameterTypes,
-                isBehaviorHasExceptionTypes,
-                isBehaviorHasAnnotationTypes
-        );
+        return new ExtFilter() {
+
+            @Override
+            public boolean isIncludeSubClasses() {
+                return bfClass.isIncludeSubClasses;
+            }
+
+            @Override
+            public boolean isIncludeBootstrap() {
+                return bfClass.isIncludeBootstrap;
+            }
+
+            @Override
+            public boolean isHasInterfaceTypes() {
+                return !bfClass.hasInterfaceTypes.isEmpty();
+            }
+
+            @Override
+            public boolean isHasAnnotationTypes() {
+                return !bfClass.hasAnnotationTypes.isEmpty();
+            }
+
+            @Override
+            public boolean isBehaviorHasWithParameterTypes() {
+                return isBehaviorHasWithParameterTypes.get();
+            }
+
+            @Override
+            public boolean isBehaviorHasExceptionTypes() {
+                return isBehaviorHasExceptionTypes.get();
+            }
+
+            @Override
+            public boolean isBehaviorHasAnnotationTypes() {
+                return isBehaviorHasAnnotationTypes.get();
+            }
+
+            @Override
+            public boolean doClassFilter(final int access,
+                                         final String javaClassName,
+                                         final String superClassTypeJavaClassName,
+                                         final String[] interfaceTypeJavaClassNameArray,
+                                         final String[] annotationTypeJavaClassNameArray) {
+                return filter.doClassFilter(
+                        access,
+                        javaClassName,
+                        superClassTypeJavaClassName,
+                        interfaceTypeJavaClassNameArray,
+                        annotationTypeJavaClassNameArray
+                );
+            }
+
+            @Override
+            public boolean doMethodFilter(final int access,
+                                          final String javaMethodName,
+                                          final String[] parameterTypeJavaClassNameArray,
+                                          final String[] throwsTypeJavaClassNameArray,
+                                          final String[] annotationTypeJavaClassNameArray) {
+                return filter.doMethodFilter(
+                        access,
+                        javaMethodName,
+                        parameterTypeJavaClassNameArray,
+                        throwsTypeJavaClassNameArray,
+                        annotationTypeJavaClassNameArray
+                );
+            }
+        };
+
     }
 
     private ProgressGroup toProgressGroup(final List<Progress> progresses) {

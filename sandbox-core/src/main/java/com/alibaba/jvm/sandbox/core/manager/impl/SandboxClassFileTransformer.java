@@ -3,6 +3,7 @@ package com.alibaba.jvm.sandbox.core.manager.impl;
 import com.alibaba.jvm.sandbox.api.event.Event;
 import com.alibaba.jvm.sandbox.api.event.Event.Type;
 import com.alibaba.jvm.sandbox.api.listener.EventListener;
+import com.alibaba.jvm.sandbox.core.CoreConfigure;
 import com.alibaba.jvm.sandbox.core.enhance.EventEnhancer;
 import com.alibaba.jvm.sandbox.core.util.ObjectIDs;
 import com.alibaba.jvm.sandbox.core.util.SandboxClassUtils;
@@ -38,36 +39,27 @@ public class SandboxClassFileTransformer implements ClassFileTransformer {
     private final String uniqueId;
     private final Matcher matcher;
     private final EventListener eventListener;
-    private final boolean isEnableUnsafe;
     private final Event.Type[] eventTypeArray;
 
-    private final String namespace;
     private final int listenerId;
     private final AffectStatistic affectStatistic = new AffectStatistic();
-    private final boolean isNativeSupported;
+    private final CoreConfigure cfg;
     private final String nativePrefix;
-    private final boolean isLambdaSupported;
 
     SandboxClassFileTransformer(final int watchId,
                                 final String uniqueId,
                                 final Matcher matcher,
                                 final EventListener eventListener,
-                                final boolean isEnableUnsafe,
                                 final Type[] eventTypeArray,
-                                final String namespace,
-                                final boolean isNativeSupported,
-                                final boolean isLambdaSupported) {
+                                final CoreConfigure cfg) {
         this.watchId = watchId;
         this.uniqueId = uniqueId;
         this.matcher = matcher;
         this.eventListener = eventListener;
-        this.isEnableUnsafe = isEnableUnsafe;
         this.eventTypeArray = eventTypeArray;
-        this.namespace = namespace;
         this.listenerId = ObjectIDs.instance.identity(eventListener);
-        this.isNativeSupported = isNativeSupported;
-        this.nativePrefix = String.format("%s$%s$%s", SANDBOX_SPECIAL_PREFIX, namespace, watchId);
-        this.isLambdaSupported = isLambdaSupported;
+        this.cfg = cfg;
+        this.nativePrefix = String.format("%s$%s$%s", SANDBOX_SPECIAL_PREFIX, cfg.getNamespace(), watchId);
     }
 
     // 获取当前类结构
@@ -96,14 +88,14 @@ public class SandboxClassFileTransformer implements ClassFileTransformer {
             }
 
             // 如果未开启unsafe开关，是不允许增强来自BootStrapClassLoader的类
-            if (!isEnableUnsafe
+            if (!cfg.isEnableUnsafe()
                     && null == loader) {
                 logger.debug("transform ignore {}, class from bootstrap but unsafe.enable=false.", internalClassName);
                 return null;
             }
 
             // 匹配类是否符合要求，如果一个行为都没匹配上也不用继续了
-            final MatchingResult result = new UnsupportedMatcher(loader, isEnableUnsafe, isNativeSupported, isLambdaSupported)
+            final MatchingResult result = new UnsupportedMatcher(loader, cfg)
                     .and(matcher)
                     .matching(getClassStructure(loader, classBeingRedefined, srcByteCodeArray));
             if (!result.isMatched()) {
@@ -148,7 +140,7 @@ public class SandboxClassFileTransformer implements ClassFileTransformer {
                     loader,
                     srcByteCodeArray,
                     behaviorSignCodes,
-                    namespace,
+                    cfg.getNamespace(),
                     listenerId,
                     eventTypeArray
             );

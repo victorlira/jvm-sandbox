@@ -2,8 +2,10 @@ package com.alibaba.jvm.sandbox.api.filter;
 
 /**
  * 增强过滤器V140实现，根据#292实现
+ * <p>已废弃，请使用{@link ExtFilter}完成实现</p>
  *
  * @since {@code sandbox-api:1.4.0}
+ * @deprecated 1.4.1
  */
 public class ExtFilterImplByV140 implements ExtFilter {
 

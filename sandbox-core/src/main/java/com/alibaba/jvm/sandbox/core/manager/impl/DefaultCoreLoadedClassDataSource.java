@@ -1,6 +1,7 @@
 package com.alibaba.jvm.sandbox.core.manager.impl;
 
 import com.alibaba.jvm.sandbox.api.filter.Filter;
+import com.alibaba.jvm.sandbox.core.CoreConfigure;
 import com.alibaba.jvm.sandbox.core.manager.CoreLoadedClassDataSource;
 import com.alibaba.jvm.sandbox.core.util.SandboxProtector;
 import com.alibaba.jvm.sandbox.core.util.matcher.ExtFilterMatcher;
@@ -26,18 +27,12 @@ public class DefaultCoreLoadedClassDataSource implements CoreLoadedClassDataSour
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Instrumentation inst;
-    private final boolean isEnableUnsafe;
-    private final boolean isNativeSupported;
-    private final boolean isLambdaSupported;
+    private final CoreConfigure cfg;
 
     public DefaultCoreLoadedClassDataSource(final Instrumentation inst,
-                                            final boolean isEnableUnsafe,
-                                            final boolean isNativeSupported,
-                                            final boolean isLambdaSupported) {
+                                            final CoreConfigure cfg) {
         this.inst = inst;
-        this.isEnableUnsafe = isEnableUnsafe;
-        this.isNativeSupported = isNativeSupported;
-        this.isLambdaSupported = isLambdaSupported;
+        this.cfg = cfg;
     }
 
     @Override
@@ -105,7 +100,7 @@ public class DefaultCoreLoadedClassDataSource implements CoreLoadedClassDataSour
                 }
                 try {
                     if (isRemoveUnsupported) {
-                        if (new UnsupportedMatcher(clazz.getClassLoader(), isEnableUnsafe, isNativeSupported, isLambdaSupported)
+                        if (new UnsupportedMatcher(clazz.getClassLoader(), cfg)
                                 .and(matcher)
                                 .matching(ClassStructureFactory.createClassStructure(clazz))
                                 .isMatched()) {

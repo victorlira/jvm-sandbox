@@ -221,9 +221,7 @@ public class DefaultCoreModuleManager implements CoreModuleManager {
                                                     inst,
                                                     classDataSource,
                                                     coreModule,
-                                                    cfg.isEnableUnsafe(),
-                                                    cfg.getNamespace(),
-                                                    cfg.isEnableLambda()
+                                                    cfg
                                             )
                                     )
                             ) {

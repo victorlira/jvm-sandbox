@@ -5,6 +5,7 @@ import com.alibaba.jvm.sandbox.api.filter.Filter;
 import com.alibaba.jvm.sandbox.api.listener.EventListener;
 import com.alibaba.jvm.sandbox.api.listener.ext.EventWatchCondition;
 import com.alibaba.jvm.sandbox.api.resource.ModuleEventWatcher;
+import com.alibaba.jvm.sandbox.core.CoreConfigure;
 import com.alibaba.jvm.sandbox.core.CoreModule;
 import com.alibaba.jvm.sandbox.core.enhance.weaver.EventListenerHandler;
 import com.alibaba.jvm.sandbox.core.manager.CoreLoadedClassDataSource;
@@ -37,9 +38,7 @@ public class DefaultModuleEventWatcher implements ModuleEventWatcher {
     private final Instrumentation inst;
     private final CoreLoadedClassDataSource classDataSource;
     private final CoreModule coreModule;
-    private final boolean isEnableUnsafe;
-    private final String namespace;
-    private final boolean isEnableLambda;
+    private final CoreConfigure cfg;
 
     // 观察ID序列生成器
     private final Sequencer watchIdSequencer = new Sequencer();
@@ -47,15 +46,11 @@ public class DefaultModuleEventWatcher implements ModuleEventWatcher {
     DefaultModuleEventWatcher(final Instrumentation inst,
                               final CoreLoadedClassDataSource classDataSource,
                               final CoreModule coreModule,
-                              final boolean isEnableUnsafe,
-                              final String namespace,
-                              final boolean isEnableLambda) {
+                              final CoreConfigure cfg) {
         this.inst = inst;
         this.classDataSource = classDataSource;
         this.coreModule = coreModule;
-        this.isEnableUnsafe = isEnableUnsafe;
-        this.namespace = namespace;
-        this.isEnableLambda = isEnableLambda;
+        this.cfg = cfg;
     }
 
 
@@ -209,11 +204,8 @@ public class DefaultModuleEventWatcher implements ModuleEventWatcher {
                         uniqueId,
                         matcher,
                         listener,
-                        isEnableUnsafe,
                         eventType,
-                        namespace,
-                        isNativeSupported,
-                        isEnableLambda
+                        cfg
                 );
 
         // 注册到CoreModule中

@@ -2,6 +2,7 @@ package com.alibaba.jvm.sandbox.qatest.core.manager;
 
 import com.alibaba.jvm.sandbox.api.filter.ExtFilter;
 import com.alibaba.jvm.sandbox.api.filter.NameRegexFilter;
+import com.alibaba.jvm.sandbox.core.CoreConfigure;
 import com.alibaba.jvm.sandbox.core.manager.CoreLoadedClassDataSource;
 import com.alibaba.jvm.sandbox.core.manager.impl.DefaultCoreLoadedClassDataSource;
 import com.alibaba.jvm.sandbox.qatest.core.mock.EmptyInstrumentation;
@@ -134,7 +135,10 @@ public class CoreLoadedClassDataSourceTestCase {
     }
 
     private final CoreLoadedClassDataSource coreLoadedClassDataSource
-            = new DefaultCoreLoadedClassDataSource(mockInstrumentation, false, true, true);
+            = new DefaultCoreLoadedClassDataSource(mockInstrumentation, CoreConfigure.toConfigure(
+                    "unsafe.enable=false;lambda.enable=true;native.supported=ture;",
+            null
+    ));
 
 
     @Test

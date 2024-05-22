@@ -3,7 +3,6 @@ package com.alibaba.jvm.sandbox.core.util.matcher;
 import com.alibaba.jvm.sandbox.api.filter.AccessFlags;
 import com.alibaba.jvm.sandbox.api.filter.ExtFilter;
 import com.alibaba.jvm.sandbox.api.filter.ExtFilter.ExtFilterFactory;
-import com.alibaba.jvm.sandbox.api.filter.ExtFilterImplByV140;
 import com.alibaba.jvm.sandbox.api.filter.Filter;
 import com.alibaba.jvm.sandbox.api.listener.ext.EventWatchCondition;
 import com.alibaba.jvm.sandbox.core.util.matcher.structure.*;
@@ -57,16 +56,6 @@ public class ExtFilterMatcher implements Matcher {
     private boolean matchingClassStructure(ClassStructure classStructure) {
         for (final ClassStructure wmCs : getWaitingMatchClassStructures(classStructure)) {
 
-            // #292 性能优化
-            final boolean isHasInterfaceTypes, isHasAnnotationTypes;
-            if (extFilter instanceof ExtFilterImplByV140) {
-                final ExtFilterImplByV140 v140 = (ExtFilterImplByV140) extFilter;
-                isHasInterfaceTypes = v140.isHasInterfaceTypes();
-                isHasAnnotationTypes = v140.isHasAnnotationTypes();
-            } else {
-                isHasInterfaceTypes = isHasAnnotationTypes = true;
-            }
-
             // 匹配类结构
             if (extFilter.doClassFilter(
                     toFilterAccess(wmCs.getAccess()),
@@ -75,12 +64,12 @@ public class ExtFilterMatcher implements Matcher {
                             ? null
                             : wmCs.getSuperClassStructure().getJavaClassName(),
                     toJavaClassNameArray(
-                            isHasInterfaceTypes
+                            extFilter.isHasInterfaceTypes()
                                     ? wmCs.getFamilyInterfaceClassStructures()
                                     : Collections.emptySet()
                     ),
                     toJavaClassNameArray(
-                            isHasAnnotationTypes
+                            extFilter.isHasAnnotationTypes()
                                     ? wmCs.getFamilyAnnotationTypeClassStructures()
                                     : Collections.emptySet()
                     )
@@ -132,30 +121,18 @@ public class ExtFilterMatcher implements Matcher {
             return result;
         }
 
-        final boolean isBehaviorHasWithParameterTypes, isBehaviorHasExceptionTypes, isBehaviorHasAnnotationTypes;
-        if(extFilter instanceof ExtFilterImplByV140) {
-            final ExtFilterImplByV140 v140 = (ExtFilterImplByV140)extFilter;
-            isBehaviorHasWithParameterTypes = v140.isBehaviorHasWithParameterTypes();
-            isBehaviorHasExceptionTypes = v140.isBehaviorHasExceptionTypes();
-            isBehaviorHasAnnotationTypes = v140.isBehaviorHasAnnotationTypes();
-        } else {
-            isBehaviorHasWithParameterTypes = true;
-            isBehaviorHasExceptionTypes = true;
-            isBehaviorHasAnnotationTypes = true;
-        }
-
         // 匹配BehaviorStructure
         for (final BehaviorStructure behaviorStructure : classStructure.getBehaviorStructures()) {
 
-            final String[] parameterTypeArrays = isBehaviorHasWithParameterTypes
+            final String[] parameterTypeArrays = extFilter.isBehaviorHasWithParameterTypes()
                     ? toJavaClassNameArray(behaviorStructure.getParameterTypeClassStructures())
                     : new String[0];
 
-            final String[] exceptionTypeArrays = isBehaviorHasExceptionTypes
+            final String[] exceptionTypeArrays = extFilter.isBehaviorHasExceptionTypes()
                     ? toJavaClassNameArray(behaviorStructure.getExceptionTypeClassStructures())
                     : new String[0];
 
-            final String[] annotationTypeArrays = isBehaviorHasAnnotationTypes
+            final String[] annotationTypeArrays = extFilter.isBehaviorHasAnnotationTypes()
                     ? toJavaClassNameArray(behaviorStructure.getAnnotationTypeClassStructures())
                     : new String[0];
 

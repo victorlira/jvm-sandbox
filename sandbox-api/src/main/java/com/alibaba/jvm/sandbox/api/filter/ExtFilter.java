@@ -30,6 +30,57 @@ public interface ExtFilter extends Filter {
     boolean isIncludeBootstrap();
 
     /**
+     * 是否需要过滤接口类型
+     *
+     * @return TRUE | FALSE
+     * @since {@code sandbox-api:1.4.1}
+     */
+    default boolean isHasInterfaceTypes() {
+        return true;
+    }
+
+    /**
+     * 是否需要过滤注解类型
+     *
+     * @return TRUE | FALSE
+     * @since {@code sandbox-api:1.4.1}
+     */
+    default boolean isHasAnnotationTypes() {
+        return true;
+    }
+
+    /**
+     * 是否需要方法参数类型
+     *
+     * @return TRUE | FALSE
+     * @since {@code sandbox-api:1.4.1}
+     */
+    default boolean isBehaviorHasWithParameterTypes() {
+        return true;
+    }
+
+    /**
+     * 是否需要方法异常类型
+     *
+     * @return TRUE | FALSE
+     * @since {@code sandbox-api:1.4.1}
+     */
+    default boolean isBehaviorHasExceptionTypes() {
+        return true;
+    }
+
+    /**
+     * 是否需要方法注解类型
+     *
+     * @return TRUE | FALSE
+     * @since {@code sandbox-api:1.4.1}
+     */
+    default boolean isBehaviorHasAnnotationTypes() {
+        return true;
+    }
+
+
+    /**
      * 增强过滤器工厂类
      */
     class ExtFilterFactory {
@@ -96,13 +147,12 @@ public interface ExtFilter extends Filter {
          * @return 增强过滤器
          */
         public static ExtFilter make(final Filter filter) {
-            return
-                    filter instanceof ExtFilter
-                            ? (ExtFilter) filter
-                            : make(
+            return filter instanceof ExtFilter ?
+                    (ExtFilter) filter :
+                    make(
                             filter,
-                            filter.getClass().isAnnotationPresent(IncludeSubClasses.class),
-                            filter.getClass().isAnnotationPresent(IncludeBootstrap.class)
+                            IncludeSubClasses.class.isAssignableFrom(filter.getClass()),
+                            IncludeBootstrap.class.isAssignableFrom(filter.getClass())
                     );
         }
 

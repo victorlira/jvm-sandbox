@@ -1,6 +1,7 @@
 package com.alibaba.jvm.sandbox.core.util.matcher;
 
 import com.alibaba.jvm.sandbox.api.annotation.Stealth;
+import com.alibaba.jvm.sandbox.core.CoreConfigure;
 import com.alibaba.jvm.sandbox.core.manager.impl.SandboxClassFileTransformer;
 import com.alibaba.jvm.sandbox.core.util.CoreStringUtils;
 import com.alibaba.jvm.sandbox.core.util.matcher.structure.Access;
@@ -18,18 +19,12 @@ import java.util.List;
 public class UnsupportedMatcher implements Matcher {
 
     private final ClassLoader loader;
-    private final boolean isEnableUnsafe;
-    private final boolean isNativeSupported;
-    private final boolean isLambdaSupported;
+    private final CoreConfigure cfg;
 
     public UnsupportedMatcher(final ClassLoader loader,
-                              final boolean isEnableUnsafe,
-                              final boolean isNativeSupported,
-                              final boolean isLambdaSupported) {
+                              final CoreConfigure cfg) {
         this.loader = loader;
-        this.isEnableUnsafe = isEnableUnsafe;
-        this.isNativeSupported = isNativeSupported;
-        this.isLambdaSupported = isLambdaSupported;
+        this.cfg = cfg;
     }
 
     // 是否因sandbox容器本身缺陷所暂时无法支持的类
@@ -37,7 +32,7 @@ public class UnsupportedMatcher implements Matcher {
 
         // #377 开放Lambda类的拦截
         if(CoreStringUtils.containsAny(classStructure.getJavaClassName(), "$$Lambda$")) {
-            return !isLambdaSupported;
+            return !cfg.isEnableLambda();
         }
 
         return false;
@@ -77,7 +72,7 @@ public class UnsupportedMatcher implements Matcher {
      */
     private boolean isFromStealthClassLoader() {
         if (null == loader) {
-            return !isEnableUnsafe;
+            return !cfg.isEnableUnsafe();
         }
         // FIX 292
         return loader.getClass().isAnnotationPresent(Stealth.class);
@@ -111,7 +106,7 @@ public class UnsupportedMatcher implements Matcher {
         }
 
         // 在JVM不允许native方法重定义的时候，不支持native方法
-        return access.isNative() && !isNativeSupported;
+        return access.isNative() && !cfg.isNativeSupported();
     }
 
     /*
